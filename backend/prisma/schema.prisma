@@ -1,0 +1,105 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  name      String
+  email     String   @unique
+  password  String
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  log      Log[]
+  goal     Goal[]
+  template Template?
+  metrics  UserMetrics[]
+
+  @@map("users")
+}
+
+model UserMetrics {
+  id            String   @id @default(uuid())
+  userId        String   @map("user_id")
+  createdAt     DateTime @default(now()) @map("created_at")
+  currentStreak Int      @default(0) @map("current_streak")
+  longestStreak Int      @default(0) @map("longest_streak")
+  logsThisWeek  Int      @default(0) @map("logs_this_week")
+  logsThisMonth Int      @default(0) @map("logs_this_month")
+  logsThisYear  Int      @default(0) @map("logs_this_year")
+  totalDays     Int      @default(0) @map("total_days")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_metrics")
+}
+
+model Template {
+  id        String @id @default(uuid())
+  userId    String @unique @map("user_id")
+  name      String
+  structure Json
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("templates")
+}
+
+model Log {
+  id         String   @id @default(uuid())
+  userId     String   @map("user_id")
+  dayNumber  Int      @map("day_number")
+  date       DateTime @default(now())
+  repoLink   String   @map("repo_link")
+  mood       Mood
+  customData Json?    @map("custom_data")
+
+  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  logGoals LogGoal[] @relation("LogToLogGoal")
+
+  @@map("logs")
+}
+
+model Goal {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  name      String
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  logGoals LogGoal[] @relation("GoalToLogGoal")
+
+  @@map("goals")
+}
+
+model LogGoal {
+  logId     String  @map("log_id")
+  goalId    String  @map("goal_id")
+  completed Boolean @default(false)
+
+  log  Log  @relation("LogToLogGoal", fields: [logId], references: [id], onDelete: Cascade)
+  goal Goal @relation("GoalToLogGoal", fields: [goalId], references: [id], onDelete: Cascade)
+
+  @@id([logId, goalId])
+  @@map("log_goals")
+}
+
+enum Mood {
+  HAPPY
+  SAD
+  NEUTRAL
+  ANGRY
+  EXCITED
+  ANXIOUS
+  PRODUCTIVE
+  TIRED
+  STRESSED
+  CALM
+}
