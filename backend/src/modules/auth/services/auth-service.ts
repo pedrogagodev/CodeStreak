@@ -24,7 +24,7 @@ export class AuthService {
     return {
       user: {
         ...user,
-        hashedPassword: null,
+        password: null,
       },
     };
   }
