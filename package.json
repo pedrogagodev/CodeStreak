@@ -1,9 +1,0 @@
-{
-    "name": "codestreak-monorepo",
-    "private": true,
-    "workspaces": [
-      "frontend",
-      "backend"
-    ]
-  }
-  
