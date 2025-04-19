@@ -1,4 +1,6 @@
+import { env } from "@/env";
 import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
 import { IAuthRepository } from "../interfaces/auth";
 
 export class AuthService {
@@ -36,17 +38,30 @@ export class AuthService {
       throw new Error("User not found");
     }
 
-    const isPasswordCorrectly = await bcrypt.compare(data.password, user.password);
+    const isPasswordCorrectly = await bcrypt.compare(
+      data.password,
+      user.password
+    );
 
     if (!isPasswordCorrectly) {
       throw new Error("Password is incorrect");
     }
 
+    const accessToken = jwt.sign(
+      { id: user.id, email: user.email },
+      env.AUTH_SECRET as string,
+      {
+        expiresIn: "15m",
+      }
+    );
+
     return {
       user: {
-        ...user,
-        password: null,
+        id: user.id,
+        name: user.name,
+        email: user.email,
       },
+      accessToken,
     };
   }
 }
