@@ -27,7 +27,6 @@ export const { handlers } = NextAuth({
             password: credentials.password,
           }),
         });
-        console.log("Login response status:", response.status);
 
         if (response.ok) {
           const data = await response.json();
