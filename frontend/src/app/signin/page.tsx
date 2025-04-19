@@ -23,8 +23,8 @@ import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-import GithubLogo from "@/assets/githubLogo.svg";
 import { SeparatorWithText } from "@/components/SeparatorWithText";
+import { signIn } from "next-auth/react";
 
 export const signInSchema = z.object({
   email: z.string().email({ message: "Please, provide your email" }),
@@ -41,8 +41,24 @@ export default function SignIn() {
     defaultValues: { email: "", password: "" },
   });
 
-  const handleSubmit = form.handleSubmit((data) => {
-    console.log(data);
+  const handleSubmit = form.handleSubmit(async (data) => {
+    try {
+      console.log("Attempting signIn with:", data)
+      const result = await signIn("credentials", {
+        email: data.email,
+        password: data.password,
+        redirectTo: "/",
+      });
+
+      if (result?.error) {
+        form.setError("email", { message: "Invalid credentials" });
+        return;
+      }
+
+
+    } catch (error) {
+      form.setError("email", { message: "Login error" });
+    }
   });
 
   return (
@@ -62,7 +78,7 @@ export default function SignIn() {
                     <FormItem>
                       <FormLabel>Email</FormLabel>
                       <FormControl>
-                        <Input placeholder="" type="email" {...field}/>
+                        <Input placeholder="" type="email" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -90,8 +106,18 @@ export default function SignIn() {
               <span>
                 <SeparatorWithText text="OR" />
               </span>
-              <Button className="font-bold w-full hover:cursor-pointer" variant={"outline"}>
-                <Image src={GithubLogo} alt="Github Logo" />
+              <Button
+                type="button"
+                className="font-bold w-full hover:cursor-pointer"
+                variant={"outline"}
+                onClick={() => signIn("github", { callbackUrl: "/" })}
+              >
+                <Image
+                  src="/githubLogo.svg"
+                  alt="Github Logo"
+                  width={28}
+                  height={28}
+                />
                 Sign in with Github
               </Button>
             </form>
