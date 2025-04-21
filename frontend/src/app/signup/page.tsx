@@ -17,8 +17,8 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { authService } from "@/services/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { signIn } from "next-auth/react";
 import Link from "next/link";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -44,22 +44,15 @@ export default function SignUp() {
 
   const handleSubmit = form.handleSubmit(async (data) => {
     setIsLoading(true);
-    const res = await fetch("http://localhost:3000/auth/register", {
-      method: "POST",
-      body: JSON.stringify(data),
-      headers: {
-        "Content-Type": "application/json",
+    await authService.register({
+      data: {
+        email: data.email,
+        name: data.name,
+        password: data.password,
       },
     });
-    if (res.ok) {
-      signIn("credentials", {
-        email: data.email,
-        password: data.password,
-        redirectTo: "/",
-      });
-      form.reset();
-    }
     setIsLoading(false);
+    form.reset();
   });
 
   return (
