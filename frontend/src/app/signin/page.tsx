@@ -63,7 +63,7 @@ export default function SignIn() {
 
   return (
     <div className="flex flex-col items-center justify-center h-screen">
-      <Card className="w-[85%] pt-6 pb-0">
+      <Card className="w-[85%] pt-6 pb-0 md:w-[500px]">
         <CardHeader>
           <CardTitle className="text-2xl">Sign in to your account</CardTitle>
         </CardHeader>
