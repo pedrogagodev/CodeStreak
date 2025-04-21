@@ -18,7 +18,9 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { signIn } from "next-auth/react";
 import Link from "next/link";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
@@ -33,13 +35,31 @@ const signUpSchema = z.object({
 type SignUpType = z.infer<typeof signUpSchema>;
 
 export default function SignUp() {
+  const [isLoading, setIsLoading] = useState(false);
+
   const form = useForm<SignUpType>({
     resolver: zodResolver(signUpSchema),
     defaultValues: { email: "", name: "", password: "" },
   });
 
-  const handleSubmit = form.handleSubmit((data) => {
-    console.log(data);
+  const handleSubmit = form.handleSubmit(async (data) => {
+    setIsLoading(true);
+    const res = await fetch("http://localhost:3000/auth/register", {
+      method: "POST",
+      body: JSON.stringify(data),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    if (res.ok) {
+      signIn("credentials", {
+        email: data.email,
+        password: data.password,
+        redirectTo: "/",
+      });
+      form.reset();
+    }
+    setIsLoading(false);
   });
 
   return (
@@ -93,8 +113,12 @@ export default function SignUp() {
                   </FormItem>
                 )}
               />
-              <Button type="submit" className="font-semibold w-full">
-                Submit
+              <Button
+                type="submit"
+                className="font-semibold w-full"
+                disabled={isLoading}
+              >
+                {isLoading ? "Loading..." : "Create account"}
               </Button>
             </form>
           </Form>
