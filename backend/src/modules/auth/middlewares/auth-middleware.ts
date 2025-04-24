@@ -1,4 +1,5 @@
 import { env } from "@/env/index";
+import prisma from "@/lib/prisma";
 import { NextFunction, Request, Response } from "express";
 import jwt from "jsonwebtoken";
 
@@ -9,7 +10,7 @@ interface AuthRequest extends Request {
   };
 }
 
-function verifyToken(
+async function verifyToken(
   request: AuthRequest,
   response: Response,
   next: NextFunction
@@ -26,6 +27,14 @@ function verifyToken(
       id: string;
       email: string;
     };
+
+    const user = await prisma.user.findUnique({ where: { id: decoded.id } });
+
+    if (!user) {
+      response.status(403).json({ message: "Access denied" });
+      return;
+    }
+
     request.user = decoded;
     next();
   } catch (err) {
