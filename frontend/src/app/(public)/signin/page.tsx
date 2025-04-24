@@ -43,7 +43,6 @@ export default function SignIn() {
 
   const handleSubmit = form.handleSubmit(async (data) => {
     try {
-      console.log("Attempting signIn with:", data)
       const result = await signIn("credentials", {
         email: data.email,
         password: data.password,
