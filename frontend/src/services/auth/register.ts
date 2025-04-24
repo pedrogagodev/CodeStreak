@@ -20,7 +20,7 @@ export async function register({ data }: RegisterProps) {
     signIn("credentials", {
       email: data.email,
       password: data.password,
-      redirectTo: "/",
+      redirectTo: "/dashboard",
     });
   }
 }
