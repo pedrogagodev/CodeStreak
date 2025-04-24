@@ -7,10 +7,3 @@ declare module "next-auth/jwt" {
     accessTokenExpires?: number;
   }
 }
-
-declare module "next-auth" {
-  interface User {
-    accessToken?: string;
-    refreshToken?: string;
-  }
-}
