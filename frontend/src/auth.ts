@@ -4,6 +4,7 @@ import GitHubProvider from "next-auth/providers/github";
 
 import { jwtDecode } from "jwt-decode";
 import { refreshAccessToken } from "./lib/utils";
+import { CustomUser } from "./types/customUser";
 
 export const { handlers, auth, signOut } = NextAuth({
   providers: [
@@ -60,10 +61,11 @@ export const { handlers, auth, signOut } = NextAuth({
   },
   callbacks: {
     jwt: async ({ token, user, account }) => {
+      const customUser = user as CustomUser;
       if (user && account) {
-        token.accessToken = user.accessToken;
-        token.refreshToken = user.refreshToken;
-        token.email = user.email;
+        token.accessToken = customUser.accessToken;
+        token.refreshToken = customUser.refreshToken;
+        token.email = customUser.email;
 
         if (token.accessToken) {
           const decoded = jwtDecode(token.accessToken);
