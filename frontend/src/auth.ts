@@ -5,7 +5,7 @@ import GitHubProvider from "next-auth/providers/github";
 import { jwtDecode } from "jwt-decode";
 import { refreshAccessToken } from "./lib/utils";
 
-export const { handlers, auth } = NextAuth({
+export const { handlers, auth, signOut } = NextAuth({
   providers: [
     GitHubProvider({
       clientId: process.env.GITHUB_CLIENT_ID,
