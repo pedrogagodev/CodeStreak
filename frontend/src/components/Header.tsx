@@ -34,7 +34,7 @@ export default function Header() {
                 <AvatarImage src={session.user?.image || ""} />
                 <AvatarFallback>{session.user?.name?.charAt(0)}</AvatarFallback>
               </Avatar>
-              <Button onClick={() => signOut({ redirectTo: "/" })} />
+              <Button onClick={() => signOut({ redirectTo: "/" })} variant="outline">Sign out</Button>
             </div>
           ) : (
             <div className="flex gap-4 items-center justify-center">
