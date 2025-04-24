@@ -25,6 +25,8 @@ import { z } from "zod";
 
 import { SeparatorWithText } from "@/components/SeparatorWithText";
 import { signIn } from "next-auth/react";
+import { redirect } from "next/navigation";
+import { useState } from "react";
 
 export const signInSchema = z.object({
   email: z.string().email({ message: "Please, provide your email" }),
@@ -36,6 +38,9 @@ export const signInSchema = z.object({
 type SignInType = z.infer<typeof signInSchema>;
 
 export default function SignIn() {
+  const [isCredentialsError, setIsCredentialsError] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+
   const form = useForm<SignInType>({
     resolver: zodResolver(signInSchema),
     defaultValues: { email: "", password: "" },
@@ -43,20 +48,25 @@ export default function SignIn() {
 
   const handleSubmit = form.handleSubmit(async (data) => {
     try {
+      setIsCredentialsError(false);
+      setIsLoading(true);
       const result = await signIn("credentials", {
         email: data.email,
         password: data.password,
-        redirectTo: "/dashboard",
+        redirect: false,
       });
 
-      if (result?.error) {
-        form.setError("email", { message: "Invalid credentials" });
+      if (!result?.ok) {
         return;
       }
 
-
+      if (result?.ok) {
+        redirect("/dashboard");
+      }
+      setIsLoading(false);
     } catch (error) {
-      form.setError("email", { message: "Login error" });
+      setIsCredentialsError(true);
+      setIsLoading(false);
     }
   });
 
@@ -97,8 +107,13 @@ export default function SignIn() {
                     </FormItem>
                   )}
                 />
-                <Button type="submit" className="font-semibold">
-                  Submit
+                {isCredentialsError && (
+                  <div className="text-red-500 text-sm">
+                    Invalid email or password, please try again.
+                  </div>
+                )}
+                <Button type="submit" className="font-semibold" disabled={isLoading}>
+                  {isLoading ? "... Loading" : "Sign in"}
                 </Button>
               </div>
 
