@@ -23,15 +23,17 @@ export const { handlers, auth, signOut } = NextAuth({
           return null;
         }
         try {
-          const response = await fetch("http://localhost:3000/auth/login", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              email: credentials.email,
-              password: credentials.password,
-            }),
-            credentials: "include",
-          });
+          const response = await fetch(
+            `${process.env.API_SERVER_BASE_URL}/api/auth/login`,
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                email: credentials.email,
+                password: credentials.password,
+              }),
+            }
+          );
 
           if (response.ok) {
             const parsedData = await response.json();
