@@ -2,10 +2,12 @@ import verifyToken from "@/modules/auth/middlewares/auth-middleware";
 import authRoutes from "@/modules/auth/routes/auth-routes";
 import userRoutes from "@/modules/user/routes/user-routes";
 
+import cookieParser from "cookie-parser";
 import cors from "cors";
 import express, { type Express, type Request, type Response } from "express";
 
 const setupRoutes = (app: Express) => {
+  app.use(cookieParser());
   const {} = app.use(express.json());
 
   app.use(cors());
