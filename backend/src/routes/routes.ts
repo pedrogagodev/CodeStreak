@@ -4,19 +4,20 @@ import userRoutes from "@/modules/user/routes/user-routes";
 
 import cookieParser from "cookie-parser";
 import cors from "cors";
-import express, { type Express, type Request, type Response } from "express";
+import express, { Router, type Express } from "express";
 
 const setupRoutes = (app: Express) => {
   app.use(cookieParser());
-  const {} = app.use(express.json());
-
+  app.use(express.json());
   app.use(cors());
 
-  app.get("/server-test", (req: Request, res: Response) => {
-    res.status(200).json({ message: "Server is running!" });
-  });
-  app.use("/auth", authRoutes);
-  app.use("/", verifyToken, userRoutes);
+  const apiRouter = Router();
+
+  apiRouter.use("/auth", authRoutes);
+
+  apiRouter.use("/users", verifyToken, userRoutes); 
+
+  app.use("/api", apiRouter);
 };
 
 export { setupRoutes };
